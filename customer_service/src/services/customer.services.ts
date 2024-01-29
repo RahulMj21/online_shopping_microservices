@@ -16,6 +16,7 @@ import {
   validatePassword,
 } from "@/utils";
 import { ApiError } from "@/utils/appError";
+import { Logger } from "@/utils/logger";
 
 class CustomerService {
   repository: CustomerRepository;
@@ -177,16 +178,27 @@ class CustomerService {
     switch (event) {
       case "ADD_TO_WISHLIST":
       case "REMOVE_FROM_WISHLIST":
-        this.addToWishlist(customerId, product);
+        if (customerId && product) {
+          this.addToWishlist(customerId, product);
+        }
         break;
       case "ADD_TO_CART":
-        this.manageCart({ customerId, product, qty, isRemove: false });
+        if (customerId && product && qty) {
+          this.manageCart({ customerId, product, qty, isRemove: false });
+        }
         break;
       case "REMOVE_FROM_CART":
-        this.manageCart({ customerId, product, qty, isRemove: true });
+        if (customerId && product && qty) {
+          this.manageCart({ customerId, product, qty, isRemove: true });
+        }
         break;
       case "CREATE_ORDER":
-        this.manageOrder(customerId, order);
+        if (customerId && order) {
+          this.manageOrder(customerId, order);
+        }
+        break;
+      case "TEST":
+        Logger.info("======TEST_EVENT_RECEIVED=====");
         break;
       default:
         break;

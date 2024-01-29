@@ -6,7 +6,8 @@ export type TEvent =
   | "REMOVE_FROM_WISHLIST"
   | "ADD_TO_CART"
   | "REMOVE_FROM_CART"
-  | "CREATE_ORDER";
+  | "CREATE_ORDER"
+  | "TEST";
 
 // Interfaces
 export interface IAddress {
@@ -116,10 +117,10 @@ export interface IGenerateSignatureInput {
 }
 
 export interface IEventData {
-  customerId: string;
-  product: IProduct;
-  order: IOrder;
-  qty: number;
+  customerId?: string;
+  product?: IProduct;
+  order?: IOrder;
+  qty?: number;
 }
 
 export interface IEventPayload {
