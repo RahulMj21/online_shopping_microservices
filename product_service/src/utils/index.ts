@@ -1,23 +1,8 @@
 import config from "@/config";
-import { IGenerateSignatureInput, IRequest, IUser } from "@/types";
+import { IRequest, IUser } from "@/types";
 import { Logger } from "@/utils/logger";
-import argon from "argon2";
+import axios from "axios";
 import JWT from "jsonwebtoken";
-
-export const generatePassword = async (password: string) => {
-  return await argon.hash(password);
-};
-
-export const validatePassword = async (
-  passwordHash: string,
-  password: string,
-) => {
-  return await argon.verify(passwordHash, password);
-};
-
-export const generateSignature = (payload: IGenerateSignatureInput) => {
-  return JWT.sign(payload, config.TOKEN_SECRET, { expiresIn: "30d" });
-};
 
 export const validateSignature = (req: IRequest) => {
   try {
@@ -38,5 +23,23 @@ export const formateData = (data: any) => {
     return { data };
   } else {
     throw new Error("Data Not found!");
+  }
+};
+
+export const publishCustomerEvent = async (payload: any) => {
+  try {
+    await axios.post(`${config.CUSTOMER_SERVICE_URL}/app-events`, { payload });
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+export const publishShoppingEvent = async (payload: any) => {
+  try {
+    await axios.post(`${config.SHOPPING_SERVICE_URL}/app-events`, { payload });
+    return true;
+  } catch (error) {
+    return false;
   }
 };

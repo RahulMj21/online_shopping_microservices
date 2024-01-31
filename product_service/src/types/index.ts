@@ -109,12 +109,6 @@ export interface ISignUpInput {
   phone: string;
 }
 
-export interface IGenerateSignatureInput {
-  email: string;
-  phone: string;
-  _id: string;
-}
-
 export interface IEventData {
   customerId: string;
   product: IProduct;

@@ -1,12 +1,12 @@
 import { StatusCode } from "@/constants/app.constants";
-import CustomerService from "@/services/customer.services";
 import ProductService from "@/services/product.services";
-import { IProduct, IRequest } from "@/types";
+import { IRequest } from "@/types";
 import BigPromise from "@/utils/bigPromise";
+import { Logger } from "@/utils/logger";
 import { NextFunction, Request, Response } from "express";
+import { publishCustomerEvent, publishShoppingEvent } from "@/utils";
 
 const productService = new ProductService();
-const customerService = new CustomerService();
 
 class ProductController {
   create = BigPromise(
@@ -54,12 +54,19 @@ class ProductController {
   addToWishlist = BigPromise(
     async (req: IRequest, res: Response, _next: NextFunction) => {
       if (req.user) {
-        const { _id } = req.user;
-        const product: { data: IProduct } =
-          await productService.getProductDetails(req.body._id);
+        const productPayload = await productService.getProductPayload({
+          customerId: req.user._id,
+          productId: req.body._id,
+          event: "ADD_TO_WISHLIST",
+        });
 
-        const wishlist = await customerService.addToWishlist(_id, product.data);
-        return res.status(StatusCode.CREATED).json(wishlist);
+        if (productPayload) {
+          const { data } = productPayload;
+          publishCustomerEvent(data);
+          return res.status(StatusCode.CREATED).json(data.data.product);
+        } else {
+          return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
+        }
       }
       return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
     },
@@ -68,14 +75,19 @@ class ProductController {
   removeFromWishlist = BigPromise(
     async (req: IRequest, res: Response, _next: NextFunction) => {
       if (req.user) {
-        const { _id } = req.user;
-        const productId = req.params.id;
+        const productPayload = await productService.getProductPayload({
+          customerId: req.user._id,
+          productId: req.params.id,
+          event: "REMOVE_FROM_WISHLIST",
+        });
 
-        const product: { data: IProduct } =
-          await productService.getProductDetails(productId);
-
-        const wishlist = await customerService.addToWishlist(_id, product.data);
-        return res.status(StatusCode.CREATED).json(wishlist);
+        if (productPayload) {
+          const { data } = productPayload;
+          publishCustomerEvent(data);
+          return res.status(StatusCode.CREATED).json(data.data.product);
+        } else {
+          return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
+        }
       }
       return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
     },
@@ -86,17 +98,25 @@ class ProductController {
       if (req.user) {
         const { _id, qty } = req.body;
 
-        const { data }: { data: IProduct } =
-          await productService.getProductDetails(_id);
-
-        const result = await customerService.manageCart({
-          qty,
-          product: data,
+        const productPayload = await productService.getProductPayload({
           customerId: req.user._id,
-          isRemove: false,
+          productId: _id,
+          qty,
+          event: "ADD_TO_CART",
         });
 
-        return res.status(StatusCode.CREATED).json(result);
+        if (productPayload) {
+          const { data } = productPayload;
+
+          publishCustomerEvent(data);
+          publishShoppingEvent(data);
+
+          return res
+            .status(StatusCode.CREATED)
+            .json({ product: data.data.product, unit: data.data.qty });
+        } else {
+          return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
+        }
       }
       return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
     },
@@ -105,17 +125,26 @@ class ProductController {
   removeFromCart = BigPromise(
     async (req: IRequest, res: Response, _next: NextFunction) => {
       if (req.user) {
-        const { data }: { data: IProduct } =
-          await productService.getProductDetails(req.params.id);
-
-        const result = await customerService.manageCart({
-          qty: 0,
-          product: data,
+        const { qty } = req.body;
+        const productPayload = await productService.getProductPayload({
           customerId: req.user._id,
-          isRemove: true,
+          productId: req.params.id,
+          qty,
+          event: "REMOVE_FROM_CART",
         });
 
-        return res.status(StatusCode.CREATED).json(result);
+        if (productPayload) {
+          const { data } = productPayload;
+
+          publishCustomerEvent(data);
+          publishShoppingEvent(data);
+
+          return res
+            .status(StatusCode.CREATED)
+            .json({ product: data.data.product, unit: data.data.qty });
+        } else {
+          return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
+        }
       }
       return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
     },
@@ -125,6 +154,19 @@ class ProductController {
     async (_req: Request, res: Response, _next: NextFunction) => {
       const { data } = await productService.getProducts();
       return res.status(StatusCode.CREATED).json(data);
+    },
+  );
+
+  events = BigPromise(
+    async (req: IRequest, res: Response, _next: NextFunction) => {
+      if (!req.body.payload) {
+        return res.status(StatusCode.BAD_REQUEST).json({ status: "ERROR" });
+      }
+
+      const { payload } = req.body;
+      Logger.info("===========Product Service Received Event===========");
+
+      return res.status(StatusCode.CREATED).json(payload);
     },
   );
 }

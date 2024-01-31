@@ -84,6 +84,30 @@ class ProductService {
       );
     }
   }
+
+  async getProductPayload({
+    customerId,
+    productId,
+    qty,
+    event,
+  }: {
+    customerId: string;
+    productId: string;
+    event: string;
+    qty?: number;
+  }) {
+    const product = await this.getProductDetails(productId);
+
+    if (product) {
+      const payload = {
+        event,
+        data: { customerId, product, qty },
+      };
+      return formateData(payload);
+    } else {
+      return false;
+    }
+  }
 }
 
 export default ProductService;

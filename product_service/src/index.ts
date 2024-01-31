@@ -8,7 +8,7 @@ const init = () => {
 
   app
     .listen(config.PORT, () => {
-      Logger.info(`server is running on PORT: ${config.PORT}`);
+      Logger.info(`product service running on PORT: ${config.PORT}`);
     })
     .on("error", () => {
       Logger.error("Failed to start server");

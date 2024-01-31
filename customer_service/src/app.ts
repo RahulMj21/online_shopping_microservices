@@ -22,8 +22,8 @@ app.use((req, _res, next) => {
 });
 
 // routes
-app.use("/api/customer", healthcheckRoutes);
-app.use("/api/customer", customerRoutes);
+app.use("/customer", healthcheckRoutes);
+app.use("/customer", customerRoutes);
 
 // error handling
 app.use(errorHandler);

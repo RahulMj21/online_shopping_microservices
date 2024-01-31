@@ -2,12 +2,7 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
-import {
-  customerRoutes,
-  healthcheckRoutes,
-  productRoutes,
-  shoppingRoutes,
-} from "@/routes";
+import { healthcheckRoutes, productRoutes } from "@/routes";
 import errorHandler from "@/middleware/errorHandler";
 
 const app = express();
@@ -20,10 +15,8 @@ app.use(cookieParser());
 app.use(helmet());
 
 // routes
-app.use("/api", healthcheckRoutes);
-app.use("/api/customer", customerRoutes);
-app.use("/api/product", productRoutes);
-app.use("/api/shopping", shoppingRoutes);
+app.use("/product", healthcheckRoutes);
+app.use("/product", productRoutes);
 
 // error handling
 app.use(errorHandler);
