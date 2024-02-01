@@ -3,6 +3,7 @@ import proxy from "express-http-proxy";
 import { Logger } from "@/utils/logger";
 
 const app = express();
+const PORT = process.env.PORT || 8000;
 
 app.use((req, _res, next) => {
   Logger.info(`${req.method} ==> ${req.path}`);
@@ -19,4 +20,4 @@ app.all("/customer/*", proxy("http://localhost:8001"));
 app.all("/product/*", proxy("http://localhost:8002"));
 app.all("/shopping/*", proxy("http://localhost:8003"));
 
-app.listen(8000, () => Logger.info(`API Gateway running on PORT 8000`));
+app.listen(PORT, () => Logger.info(`API Gateway running on PORT ${PORT}`));
