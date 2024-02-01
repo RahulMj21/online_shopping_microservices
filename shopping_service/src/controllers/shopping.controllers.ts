@@ -1,12 +1,10 @@
 import { StatusCode } from "@/constants/app.constants";
-import CustomerService from "@/services/customer.services";
 import ShoppingService from "@/services/shopping.services";
 import { IRequest } from "@/types";
 import BigPromise from "@/utils/bigPromise";
 import { NextFunction, Response } from "express";
 
 const shoppingService = new ShoppingService();
-const customerService = new CustomerService();
 
 class ShoppingController {
   placeOrder = BigPromise(
