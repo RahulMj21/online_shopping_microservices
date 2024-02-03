@@ -28,7 +28,9 @@ export const formateData = (data: any) => {
 
 export const publishCustomerEvent = async (payload: any) => {
   try {
-    await axios.post(`${config.CUSTOMER_SERVICE_URL}/app-events`, { payload });
+    await axios.post(`${config.API_GATEWAY_URL}/customer/app-events`, {
+      payload,
+    });
     return true;
   } catch (error) {
     return false;
@@ -37,7 +39,9 @@ export const publishCustomerEvent = async (payload: any) => {
 
 export const publishShoppingEvent = async (payload: any) => {
   try {
-    await axios.post(`${config.SHOPPING_SERVICE_URL}/app-events`, { payload });
+    await axios.post(`${config.API_GATEWAY_URL}/shopping/app-events`, {
+      payload,
+    });
     return true;
   } catch (error) {
     return false;

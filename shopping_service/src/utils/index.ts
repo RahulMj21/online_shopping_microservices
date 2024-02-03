@@ -1,19 +1,8 @@
 import config from "@/config";
 import { IGenerateSignatureInput, IRequest, IUser } from "@/types";
 import { Logger } from "@/utils/logger";
-import argon from "argon2";
 import JWT from "jsonwebtoken";
-
-export const generatePassword = async (password: string) => {
-  return await argon.hash(password);
-};
-
-export const validatePassword = async (
-  passwordHash: string,
-  password: string,
-) => {
-  return await argon.verify(passwordHash, password);
-};
+import axios from "axios";
 
 export const generateSignature = (payload: IGenerateSignatureInput) => {
   return JWT.sign(payload, config.TOKEN_SECRET, { expiresIn: "30d" });
@@ -38,5 +27,16 @@ export const formateData = (data: any) => {
     return { data };
   } else {
     throw new Error("Data Not found!");
+  }
+};
+
+export const publishCustomerEvent = async (payload: any) => {
+  try {
+    await axios.post(`${config.API_GATEWAY_URL}/customer/app-events`, {
+      payload,
+    });
+    return true;
+  } catch (error) {
+    return false;
   }
 };

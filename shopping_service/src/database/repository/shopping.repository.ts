@@ -1,15 +1,13 @@
 import { StatusCode } from "@/constants/app.constants";
 import { ApiError } from "@/utils/appError";
-import { CustomerModel, OrderModel } from "@/database/models";
-import { ICreateOrderInput, IProduct } from "@/types";
+import { CartModel, OrderModel } from "@/database/models";
+import { IAddToCartInput, ICreateOrderInput } from "@/types";
 import { v4 as uuid } from "uuid";
 
 class ShoppingRepository {
   async orders(customerId: string) {
     try {
-      const orders = await OrderModel.find({ customerId }).populate(
-        "items.product",
-      );
+      const orders = await OrderModel.find({ customerId });
       return orders;
     } catch (error) {
       throw new ApiError(
@@ -20,20 +18,93 @@ class ShoppingRepository {
     }
   }
 
+  async orderDetails(orderId: string) {
+    try {
+      const order = await OrderModel.findOne({ orderId });
+      return order;
+    } catch (error) {
+      throw new ApiError(
+        "API ERROR",
+        StatusCode.SERVER_ERROR,
+        "unable to find orders",
+      );
+    }
+  }
+
+  async cart(customerId: string) {
+    try {
+      const cartItem = await CartModel.findOne({ customerId });
+      return cartItem;
+    } catch (error) {
+      throw new ApiError(
+        "API ERROR",
+        StatusCode.SERVER_ERROR,
+        "unable to find cart",
+      );
+    }
+  }
+
+  async addCartItem({ customerId, qty, product, isRemove }: IAddToCartInput) {
+    try {
+      const cart = await CartModel.findOne({ customerId });
+
+      if (cart) {
+        cart;
+        let isExist = false;
+        let cartItems = cart.items;
+
+        cart.items.forEach(async (item, idx) => {
+          if (String(item.product._id) === String(product._id)) {
+            isExist = true;
+            if (isRemove) {
+              if (cart.items.length === 1) {
+                await cart.deleteOne();
+                return;
+              }
+              cartItems.splice(idx, 1);
+            } else {
+              cartItems[idx].qty = qty;
+            }
+          }
+        });
+
+        if (!isExist && !isRemove) {
+          cartItems.push({ product, unit: qty });
+        }
+
+        cart.items = cartItems;
+        const cartResult = await cart.save();
+        return cartResult;
+      } else {
+        // create cart item
+        const cartResult = await CartModel.create({
+          customerId,
+          items: [{ product, unit: qty }],
+        });
+        return cartResult;
+      }
+    } catch (error) {
+      throw new ApiError(
+        "API ERROR",
+        StatusCode.SERVER_ERROR,
+        "unable to add to cart",
+      );
+    }
+  }
+
   async createNewOrder({ customerId, txnId }: ICreateOrderInput) {
     try {
-      const customer =
-        await CustomerModel.findById(customerId).populate("cart.product");
+      const cart = await CartModel.findOne({ customerId });
 
-      if (customer) {
+      if (cart) {
         let amount = 0;
-        let cartItems = customer.cart;
+        let cartItems = cart.items;
 
         if (cartItems.length > 0) {
-          cartItems.forEach((item) => {
-            const product = item.product as IProduct;
-            amount += product.price * product.unit;
-          });
+          amount = cartItems.reduce(
+            (accum, item) => (accum += item.product.price * item.unit),
+            0,
+          );
         }
 
         const orderId = uuid();
@@ -47,13 +118,8 @@ class ShoppingRepository {
           items: cartItems,
         });
 
-        customer.cart = [];
-
-        order.populate("items.product");
         const orderResult = await order.save();
-
-        customer.orders.push(orderResult);
-        await customer.save();
+        await cart.deleteOne();
 
         return orderResult;
       }

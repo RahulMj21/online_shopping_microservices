@@ -2,6 +2,7 @@ import { Request } from "express";
 
 // Types
 export type TEvent =
+  | "TEST"
   | "ADD_TO_WISHLIST"
   | "REMOVE_FROM_WISHLIST"
   | "ADD_TO_CART"
@@ -118,7 +119,6 @@ export interface IGenerateSignatureInput {
 export interface IEventData {
   customerId: string;
   product: IProduct;
-  order: IOrder;
   qty: number;
 }
 
