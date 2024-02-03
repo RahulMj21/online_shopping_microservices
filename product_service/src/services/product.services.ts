@@ -96,12 +96,12 @@ class ProductService {
     event: string;
     qty?: number;
   }) {
-    const product = await this.getProductDetails(productId);
+    const { data } = await this.getProductDetails(productId);
 
-    if (product) {
+    if (data) {
       const payload = {
         event,
-        data: { customerId, product, qty },
+        data: { customerId, product: data, qty },
       };
       return formateData(payload);
     } else {

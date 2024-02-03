@@ -28,7 +28,10 @@ export const formateData = (data: any) => {
 
 export const publishCustomerEvent = async (payload: any) => {
   try {
-    await axios.post(`${config.API_GATEWAY_URL}/customer/app-events`, {
+    // await axios.post(`${config.API_GATEWAY_URL}/customer/app-events`, {
+    //   payload,
+    // });
+    await axios.post(`http://localhost:8001/customer/app-events`, {
       payload,
     });
     return true;
@@ -39,7 +42,10 @@ export const publishCustomerEvent = async (payload: any) => {
 
 export const publishShoppingEvent = async (payload: any) => {
   try {
-    await axios.post(`${config.API_GATEWAY_URL}/shopping/app-events`, {
+    // await axios.post(`${config.API_GATEWAY_URL}/shopping/app-events`, {
+    //   payload,
+    // });
+    await axios.post(`http://localhost:8003/shopping/app-events`, {
       payload,
     });
     return true;

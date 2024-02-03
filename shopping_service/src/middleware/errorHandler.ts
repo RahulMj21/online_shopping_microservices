@@ -10,7 +10,7 @@ const errorHandler = async (
   const errorLogger = new ErrorLogger();
 
   process.on("uncaughtException", (reason) => {
-    console.log(reason, "UNHANDLED");
+    errorLogger.logError(reason);
     throw reason; // need to take care
   });
 
@@ -21,9 +21,6 @@ const errorHandler = async (
     }
   });
 
-  // console.log(err.description, '-------> DESCRIPTION')
-  // console.log(err.message, '-------> MESSAGE')
-  // console.log(err.name, '-------> NAME')
   if (err) {
     await errorLogger.logError(err);
     if (errorLogger.isTrustError(err)) {

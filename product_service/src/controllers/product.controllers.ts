@@ -6,14 +6,18 @@ import { Logger } from "@/utils/logger";
 import { NextFunction, Request, Response } from "express";
 import { publishCustomerEvent, publishShoppingEvent } from "@/utils";
 
-const productService = new ProductService();
-
 class ProductController {
+  service: ProductService;
+
+  constructor() {
+    this.service = new ProductService();
+  }
+
   create = BigPromise(
     async (req: IRequest, res: Response, _next: NextFunction) => {
       const { name, desc, type, unit, price, available, suplier, banner } =
         req.body;
-      const { data } = await productService.createProduct({
+      const { data } = await this.service.createProduct({
         name,
         type,
         unit,
@@ -30,7 +34,7 @@ class ProductController {
   getByCategory = BigPromise(
     async (req: IRequest, res: Response, _next: NextFunction) => {
       const type = req.params.type;
-      const { data } = await productService.getProductsByCategory(type);
+      const { data } = await this.service.getProductsByCategory(type);
       return res.status(StatusCode.CREATED).json(data);
     },
   );
@@ -38,7 +42,7 @@ class ProductController {
   getById = BigPromise(
     async (req: IRequest, res: Response, _next: NextFunction) => {
       const id = req.params.id;
-      const { data } = await productService.getProductDetails(id);
+      const { data } = await this.service.getProductDetails(id);
       return res.status(StatusCode.CREATED).json(data);
     },
   );
@@ -46,7 +50,7 @@ class ProductController {
   getByIds = BigPromise(
     async (req: IRequest, res: Response, _next: NextFunction) => {
       const { ids } = await req.body;
-      const { data } = await productService.getProductsByIds(ids);
+      const { data } = await this.service.getProductsByIds(ids);
       return res.status(StatusCode.CREATED).json(data);
     },
   );
@@ -54,7 +58,7 @@ class ProductController {
   addToWishlist = BigPromise(
     async (req: IRequest, res: Response, _next: NextFunction) => {
       if (req.user) {
-        const productPayload = await productService.getProductPayload({
+        const productPayload = await this.service.getProductPayload({
           customerId: req.user._id,
           productId: req.body._id,
           event: "ADD_TO_WISHLIST",
@@ -75,7 +79,7 @@ class ProductController {
   removeFromWishlist = BigPromise(
     async (req: IRequest, res: Response, _next: NextFunction) => {
       if (req.user) {
-        const productPayload = await productService.getProductPayload({
+        const productPayload = await this.service.getProductPayload({
           customerId: req.user._id,
           productId: req.params.id,
           event: "REMOVE_FROM_WISHLIST",
@@ -98,7 +102,7 @@ class ProductController {
       if (req.user) {
         const { _id, qty } = req.body;
 
-        const productPayload = await productService.getProductPayload({
+        const productPayload = await this.service.getProductPayload({
           customerId: req.user._id,
           productId: _id,
           qty,
@@ -126,7 +130,7 @@ class ProductController {
     async (req: IRequest, res: Response, _next: NextFunction) => {
       if (req.user) {
         const { qty } = req.body;
-        const productPayload = await productService.getProductPayload({
+        const productPayload = await this.service.getProductPayload({
           customerId: req.user._id,
           productId: req.params.id,
           qty,
@@ -152,7 +156,7 @@ class ProductController {
 
   getAllProducts = BigPromise(
     async (_req: Request, res: Response, _next: NextFunction) => {
-      const { data } = await productService.getProducts();
+      const { data } = await this.service.getProducts();
       return res.status(StatusCode.CREATED).json(data);
     },
   );

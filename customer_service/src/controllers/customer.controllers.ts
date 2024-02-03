@@ -5,13 +5,17 @@ import BigPromise from "@/utils/bigPromise";
 import { Logger } from "@/utils/logger";
 import { NextFunction, Request, Response } from "express";
 
-const customerService = new CustomerService();
-
 class CustomerController {
+  service: CustomerService;
+
+  constructor() {
+    this.service = new CustomerService();
+  }
+
   signup = BigPromise(
     async (req: Request, res: Response, _next: NextFunction) => {
       const { email, password, phone } = req.body;
-      const { data } = await customerService.signUp({ email, phone, password });
+      const { data } = await this.service.signUp({ email, phone, password });
       return res.status(StatusCode.CREATED).json(data);
     },
   );
@@ -19,7 +23,7 @@ class CustomerController {
   login = BigPromise(
     async (req: Request, res: Response, _next: NextFunction) => {
       const { email, password } = req.body;
-      const data = await customerService.signIn({ email, password });
+      const data = await this.service.signIn({ email, password });
       return res.status(StatusCode.OK).json(data?.data);
     },
   );
@@ -29,7 +33,7 @@ class CustomerController {
       if (req.user) {
         const { _id } = req.user;
         const { street, postalCode, city, country } = req.body;
-        const { data } = await customerService.addNewAddress({
+        const { data } = await this.service.addNewAddress({
           customerId: _id,
           city,
           street,
@@ -47,7 +51,7 @@ class CustomerController {
     async (req: IRequest, res: Response, _next: NextFunction) => {
       if (req.user) {
         const { _id } = req.user;
-        const { data } = await customerService.getProfile(_id);
+        const { data } = await this.service.getProfile(_id);
         return res.status(StatusCode.OK).json(data);
       }
       return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
@@ -58,7 +62,7 @@ class CustomerController {
     async (req: IRequest, res: Response, _next: NextFunction) => {
       if (req.user) {
         const { _id } = req.user;
-        const { data } = await customerService.getProfile(_id);
+        const { data } = await this.service.getProfile(_id);
         return res.status(StatusCode.OK).json(data);
       }
       return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
@@ -69,7 +73,7 @@ class CustomerController {
     async (req: IRequest, res: Response, _next: NextFunction) => {
       if (req.user) {
         const { _id } = req.user;
-        const { data } = await customerService.getWishlist(_id);
+        const { data } = await this.service.getWishlist(_id);
         return res.status(StatusCode.OK).json(data);
       }
       return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
@@ -83,7 +87,7 @@ class CustomerController {
       }
 
       const payload = req.body.payload;
-      customerService.subscribeEvents(payload);
+      this.service.subscribeEvents(payload);
 
       Logger.info("======CUSTOMER SERVICE RECEIVED EVENT=====");
 
