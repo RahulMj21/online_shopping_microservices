@@ -29,6 +29,9 @@ class ShoppingController {
           event: "CREATE_ORDER",
           order: data,
         });
+        // console.log("----------------------------------------");
+        // console.log(JSON.stringify({ payload }));
+        // console.log("----------------------------------------");
 
         publishCustomerEvent(payload);
 

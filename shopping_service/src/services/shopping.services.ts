@@ -109,7 +109,7 @@ class ShoppingService {
     }
   }
 
-  async getOrderPayload({
+  getOrderPayload({
     customerId,
     order,
     event,
