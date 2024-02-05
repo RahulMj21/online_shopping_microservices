@@ -1,16 +1,18 @@
 import { StatusCode } from "@/constants/app.constants";
 import ProductService from "@/services/product.services";
+import QueueService from "@/services/queue.services";
 import { IRequest } from "@/types";
 import BigPromise from "@/utils/bigPromise";
 import { Logger } from "@/utils/logger";
 import { NextFunction, Request, Response } from "express";
-import { publishCustomerEvent, publishShoppingEvent } from "@/utils";
 
 class ProductController {
   service: ProductService;
+  queueSercice: QueueService;
 
   constructor() {
     this.service = new ProductService();
+    this.queueSercice = new QueueService();
   }
 
   create = BigPromise(
@@ -66,7 +68,7 @@ class ProductController {
 
         if (productPayload) {
           const { data } = productPayload;
-          publishCustomerEvent(data);
+          this.queueSercice.publishCustomerMessage(data);
           return res.status(StatusCode.CREATED).json(data.data.product);
         } else {
           return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
@@ -87,7 +89,7 @@ class ProductController {
 
         if (productPayload) {
           const { data } = productPayload;
-          publishCustomerEvent(data);
+          this.queueSercice.publishCustomerMessage(data);
           return res.status(StatusCode.CREATED).json(data.data.product);
         } else {
           return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
@@ -112,8 +114,8 @@ class ProductController {
         if (productPayload) {
           const { data } = productPayload;
 
-          publishCustomerEvent(data);
-          publishShoppingEvent(data);
+          this.queueSercice.publishCustomerMessage(data);
+          this.queueSercice.publishShoppingMessage(data);
 
           return res
             .status(StatusCode.CREATED)
@@ -140,8 +142,8 @@ class ProductController {
         if (productPayload) {
           const { data } = productPayload;
 
-          publishCustomerEvent(data);
-          publishShoppingEvent(data);
+          this.queueSercice.publishCustomerMessage(data);
+          this.queueSercice.publishShoppingMessage(data);
 
           return res
             .status(StatusCode.CREATED)

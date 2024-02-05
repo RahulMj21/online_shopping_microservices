@@ -2,9 +2,12 @@ import app from "@/app";
 import config from "@/config";
 import { ConnectDB } from "@/database";
 import { Logger } from "@/utils/logger";
+import { createChannel } from "@/utils/messageBroker";
 
-const init = () => {
+const init = async () => {
   ConnectDB();
+
+  config.MQ_CHANNEL = await createChannel();
 
   app
     .listen(config.PORT, () => {
