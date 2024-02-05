@@ -2,7 +2,6 @@ import config from "@/config";
 import { IGenerateSignatureInput, IRequest, IUser } from "@/types";
 import { Logger } from "@/utils/logger";
 import JWT from "jsonwebtoken";
-import axios from "axios";
 
 export const generateSignature = (payload: IGenerateSignatureInput) => {
   return JWT.sign(payload, config.TOKEN_SECRET, { expiresIn: "30d" });
@@ -27,19 +26,5 @@ export const formateData = (data: any) => {
     return { data };
   } else {
     throw new Error("Data Not found!");
-  }
-};
-
-export const publishCustomerEvent = async (payload: any) => {
-  try {
-    // await axios.post(`${config.API_GATEWAY_URL}/customer/app-events`, {
-    //   payload,
-    // });
-    await axios.post(`http://localhost:8001/customer/app-events`, {
-      payload,
-    });
-    return true;
-  } catch (error) {
-    return false;
   }
 };

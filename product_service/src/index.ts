@@ -7,7 +7,7 @@ import { createChannel } from "@/utils/messageBroker";
 const init = async () => {
   ConnectDB();
 
-  config.MQ_CHANNEL = await createChannel();
+  await createChannel();
 
   app
     .listen(config.PORT, () => {

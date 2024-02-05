@@ -1,16 +1,18 @@
 import { StatusCode } from "@/constants/app.constants";
+import QueueService from "@/services/queue.services";
 import ShoppingService from "@/services/shopping.services";
 import { IRequest } from "@/types";
-import { publishCustomerEvent } from "@/utils";
 import BigPromise from "@/utils/bigPromise";
 import { Logger } from "@/utils/logger";
 import { NextFunction, Response } from "express";
 
 class ShoppingController {
   service: ShoppingService;
+  queueService: QueueService;
 
   constructor() {
     this.service = new ShoppingService();
+    this.queueService = new QueueService();
   }
 
   placeOrder = BigPromise(
@@ -33,7 +35,7 @@ class ShoppingController {
         // console.log(JSON.stringify({ payload }));
         // console.log("----------------------------------------");
 
-        publishCustomerEvent(payload);
+        this.queueService.publishCustomerMessage(payload);
 
         return res.status(StatusCode.CREATED).json(data);
       }

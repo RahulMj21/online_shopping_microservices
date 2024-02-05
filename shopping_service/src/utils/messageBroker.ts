@@ -1,6 +1,5 @@
 import config from "@/config";
 import amqplib from "amqplib";
-import { Logger } from "@/utils/logger";
 
 // Create Channel
 export const createChannel = async () => {
@@ -10,7 +9,6 @@ export const createChannel = async () => {
     await channel.assertExchange(config.EXCHANGE_NAME, "direct", {
       durable: false,
     });
-
     config.MQ_CHANNEL = channel;
     return channel;
   } catch (error) {
@@ -31,7 +29,7 @@ export const publishMessage = (bindingKey: string, message: any) => {
   }
 };
 
-// Publish Message
+// Subscribe Message
 export const subscribeMessage = async (bindingKey: string) => {
   try {
     const channel = config.MQ_CHANNEL;
@@ -42,8 +40,8 @@ export const subscribeMessage = async (bindingKey: string) => {
 
     channel.consume(appQueue.queue, (data) => {
       if (data) {
-        console.log("-----------------Received in Queue-------------------");
-        Logger.info(data.content.toString());
+        console.log("-------------------Received in Queue-------------------");
+        console.log(data.content.toString());
         channel.ack(data);
       }
     });
