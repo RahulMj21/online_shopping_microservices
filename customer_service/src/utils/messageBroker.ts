@@ -1,11 +1,10 @@
 import config from "@/config";
-import amqplib from "amqplib";
-import { Logger } from "@/utils/logger";
+import amqp from "amqplib";
 
 // Create Channel
 export const createChannel = async () => {
   try {
-    const conn = await amqplib.connect(config.MESSAGE_BROKER_URL);
+    const conn = await amqp.connect(config.MESSAGE_BROKER_URL);
     const channel = await conn.createChannel();
     await channel.assertExchange(config.EXCHANGE_NAME, "direct", {
       durable: false,
@@ -18,20 +17,18 @@ export const createChannel = async () => {
   }
 };
 
-// Publish Message
-export const publishMessage = (bindingKey: string, message: any) => {
+export const publishMessage = (bindingKey: string, data: any) => {
   try {
-    config.MQ_CHANNEL?.publish(
-      config.EXCHANGE_NAME,
+    config?.MQ_CHANNEL?.publish(
+      config?.EXCHANGE_NAME,
       bindingKey,
-      Buffer.from(message),
+      Buffer.from(data),
     );
   } catch (error) {
     throw error;
   }
 };
 
-// Subscribe Message
 export const subscribeMessage = async (bindingKey: string) => {
   try {
     const channel = config.MQ_CHANNEL;
@@ -42,8 +39,8 @@ export const subscribeMessage = async (bindingKey: string) => {
 
     channel.consume(appQueue.queue, (data) => {
       if (data) {
-        console.log("-----------------Received in Queue-------------------");
-        Logger.info(data.content.toString());
+        console.log("-------------------Received in Queue-------------------");
+        console.log(data.content.toString());
         channel.ack(data);
       }
     });

@@ -79,21 +79,6 @@ class CustomerController {
       return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
     },
   );
-
-  events = BigPromise(
-    async (req: IRequest, res: Response, _next: NextFunction) => {
-      if (!req.body.payload) {
-        return res.status(StatusCode.BAD_REQUEST).json({ status: "ERROR" });
-      }
-
-      const payload = req.body.payload;
-      this.service.subscribeEvents(payload);
-
-      Logger.info("======CUSTOMER SERVICE RECEIVED EVENT=====");
-
-      return res.status(StatusCode.OK).json(payload);
-    },
-  );
 }
 
 export default CustomerController;

@@ -16,7 +16,4 @@ router.get("/all", Product.getAllProducts);
 router.get("/category/:type", Product.getByCategory);
 router.get("/:id", Product.getById);
 
-// Events Route
-router.post("/app-events", Product.events);
-
 export default router;

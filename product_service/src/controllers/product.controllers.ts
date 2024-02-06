@@ -3,7 +3,6 @@ import ProductService from "@/services/product.services";
 import QueueService from "@/services/queue.services";
 import { IRequest } from "@/types";
 import BigPromise from "@/utils/bigPromise";
-import { Logger } from "@/utils/logger";
 import { NextFunction, Request, Response } from "express";
 
 class ProductController {
@@ -160,19 +159,6 @@ class ProductController {
     async (_req: Request, res: Response, _next: NextFunction) => {
       const { data } = await this.service.getProducts();
       return res.status(StatusCode.CREATED).json(data);
-    },
-  );
-
-  events = BigPromise(
-    async (req: IRequest, res: Response, _next: NextFunction) => {
-      if (!req.body.payload) {
-        return res.status(StatusCode.BAD_REQUEST).json({ status: "ERROR" });
-      }
-
-      const { payload } = req.body;
-      Logger.info("===========Product Service Received Event===========");
-
-      return res.status(StatusCode.CREATED).json(payload);
     },
   );
 }
