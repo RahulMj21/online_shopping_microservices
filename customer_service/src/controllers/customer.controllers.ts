@@ -1,15 +1,17 @@
 import { StatusCode } from "@/constants/app.constants";
 import CustomerService from "@/services/customer.services";
+import QueueService from "@/services/queue.services";
 import { IRequest } from "@/types";
 import BigPromise from "@/utils/bigPromise";
-import { Logger } from "@/utils/logger";
 import { NextFunction, Request, Response } from "express";
 
 class CustomerController {
   service: CustomerService;
+  queueService: QueueService;
 
   constructor() {
     this.service = new CustomerService();
+    this.queueService = new QueueService();
   }
 
   signup = BigPromise(

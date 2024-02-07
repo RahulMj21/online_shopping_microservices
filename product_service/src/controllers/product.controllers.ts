@@ -7,11 +7,11 @@ import { NextFunction, Request, Response } from "express";
 
 class ProductController {
   service: ProductService;
-  queueSercice: QueueService;
+  queueService: QueueService;
 
   constructor() {
     this.service = new ProductService();
-    this.queueSercice = new QueueService();
+    this.queueService = new QueueService();
   }
 
   create = BigPromise(
@@ -67,7 +67,7 @@ class ProductController {
 
         if (productPayload) {
           const { data } = productPayload;
-          this.queueSercice.publishCustomerMessage(data);
+          this.queueService.publishCustomerMessage(data);
           return res.status(StatusCode.CREATED).json(data.data.product);
         } else {
           return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
@@ -88,7 +88,7 @@ class ProductController {
 
         if (productPayload) {
           const { data } = productPayload;
-          this.queueSercice.publishCustomerMessage(data);
+          this.queueService.publishCustomerMessage(data);
           return res.status(StatusCode.CREATED).json(data.data.product);
         } else {
           return res.status(StatusCode.SERVER_ERROR).json({ status: "ERROR" });
@@ -113,8 +113,8 @@ class ProductController {
         if (productPayload) {
           const { data } = productPayload;
 
-          this.queueSercice.publishCustomerMessage(data);
-          this.queueSercice.publishShoppingMessage(data);
+          this.queueService.publishCustomerMessage(data);
+          this.queueService.publishShoppingMessage(data);
 
           return res
             .status(StatusCode.CREATED)
@@ -141,8 +141,8 @@ class ProductController {
         if (productPayload) {
           const { data } = productPayload;
 
-          this.queueSercice.publishCustomerMessage(data);
-          this.queueSercice.publishShoppingMessage(data);
+          this.queueService.publishCustomerMessage(data);
+          this.queueService.publishShoppingMessage(data);
 
           return res
             .status(StatusCode.CREATED)

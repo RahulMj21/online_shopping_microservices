@@ -8,10 +8,13 @@ export const createChannel = async () => {
     const conn = await amqplib.connect(config.MESSAGE_BROKER_URL);
     const channel = await conn.createChannel();
     await channel.assertExchange(config.EXCHANGE_NAME, "direct", {
-      durable: false,
+      durable: true,
     });
 
     config.MQ_CHANNEL = channel;
+
+    Logger.info("Message Broker Connected...");
+
     return channel;
   } catch (error) {
     throw error;
@@ -24,7 +27,7 @@ export const publishMessage = (bindingKey: string, message: any) => {
     config.MQ_CHANNEL?.publish(
       config.EXCHANGE_NAME,
       bindingKey,
-      Buffer.from(message),
+      Buffer.from(JSON.stringify(message)),
     );
   } catch (error) {
     throw error;
@@ -32,12 +35,15 @@ export const publishMessage = (bindingKey: string, message: any) => {
 };
 
 // Subscribe Message
-export const subscribeMessage = async (bindingKey: string) => {
+export const subscribeMessage = async (
+  bindingKey: string,
+  queueName: string,
+) => {
   try {
     const channel = config.MQ_CHANNEL;
     if (!channel) return;
 
-    const appQueue = await channel.assertQueue(config.QUEUE_NAME);
+    const appQueue = await channel.assertQueue(queueName);
     await channel.bindQueue(appQueue.queue, config.EXCHANGE_NAME, bindingKey);
 
     channel.consume(appQueue.queue, (data) => {
@@ -47,6 +53,24 @@ export const subscribeMessage = async (bindingKey: string) => {
         channel.ack(data);
       }
     });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const initMessageBroker = async () => {
+  try {
+    const channel = await createChannel();
+    if (channel) {
+      await subscribeMessage(
+        config.CUSTOMER_BINDING_KEY,
+        config.CUSTOMER_QUEUE,
+      );
+      await subscribeMessage(
+        config.SHOPPING_BINDING_KEY,
+        config.SHOPPING_QUEUE,
+      );
+    }
   } catch (error) {
     throw error;
   }

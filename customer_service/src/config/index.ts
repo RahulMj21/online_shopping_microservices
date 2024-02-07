@@ -14,8 +14,7 @@ interface IConfig {
   TOKEN_SECRET: string;
   MESSAGE_BROKER_URL: string;
   EXCHANGE_NAME: string;
-  QUEUE_NAME: string;
-  SHOPPING_BINDING_KEY: string;
+  CUSTOMER_QUEUE: string;
   CUSTOMER_BINDING_KEY: string;
   MQ_CHANNEL: Channel | null;
 }
@@ -26,8 +25,7 @@ const config: IConfig = {
   TOKEN_SECRET: process.env.TOKEN_SECRET as string,
   MESSAGE_BROKER_URL: process.env.MESSAGE_BROKER_URL as string,
   EXCHANGE_NAME: process.env.EXCHANGE_NAME as string,
-  QUEUE_NAME: process.env.QUEUE_NAME as string,
-  SHOPPING_BINDING_KEY: process.env.SHOPPING_BINDING_KEY as string,
+  CUSTOMER_QUEUE: process.env.CUSTOMER_QUEUE as string,
   CUSTOMER_BINDING_KEY: process.env.CUSTOMER_BINDING_KEY as string,
   MQ_CHANNEL: null,
 };
