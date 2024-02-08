@@ -4,4 +4,4 @@ dist
 .env
 .env.dev
 
-*.log
+app_error.log

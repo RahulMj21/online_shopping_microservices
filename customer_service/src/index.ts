@@ -2,11 +2,9 @@ import app from "@/app";
 import config from "@/config";
 import { ConnectDB } from "@/database";
 import { Logger } from "@/utils/logger";
-import { initMessageBroker } from "@/utils/messageBroker";
 
 const init = async () => {
   ConnectDB();
-  initMessageBroker();
 
   app
     .listen(config.PORT, () => {

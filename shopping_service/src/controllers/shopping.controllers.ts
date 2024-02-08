@@ -11,7 +11,7 @@ class ShoppingController {
 
   constructor() {
     this.service = new ShoppingService();
-    this.queueService = new QueueService();
+    this.queueService = new QueueService(this.service);
   }
 
   placeOrder = BigPromise(

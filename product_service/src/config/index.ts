@@ -1,5 +1,4 @@
 import dotenv from "dotenv";
-import { Channel } from "amqplib";
 
 if (process.env.NODE_ENV !== "prod") {
   const configFile = `./.env.${process.env.NODE_ENV}`;
@@ -18,11 +17,10 @@ interface IConfig {
   CUSTOMER_QUEUE: string;
   SHOPPING_BINDING_KEY: string;
   CUSTOMER_BINDING_KEY: string;
-  MQ_CHANNEL: Channel | null;
 }
 
 const config: IConfig = {
-  PORT: process.env.PORT || "8000",
+  PORT: process.env.PORT || "8002",
   DB_URL: process.env.DB_URL as string,
   TOKEN_SECRET: process.env.TOKEN_SECRET as string,
   MESSAGE_BROKER_URL: process.env.MESSAGE_BROKER_URL as string,
@@ -31,7 +29,6 @@ const config: IConfig = {
   CUSTOMER_QUEUE: process.env.CUSTOMER_QUEUE as string,
   SHOPPING_BINDING_KEY: process.env.SHOPPING_BINDING_KEY as string,
   CUSTOMER_BINDING_KEY: process.env.CUSTOMER_BINDING_KEY as string,
-  MQ_CHANNEL: null,
 };
 
 export default config;
