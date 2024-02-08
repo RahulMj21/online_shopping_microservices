@@ -11,7 +11,7 @@ class CustomerController {
 
   constructor() {
     this.service = new CustomerService();
-    this.queueService = new QueueService();
+    this.queueService = new QueueService(this.service);
   }
 
   signup = BigPromise(
