@@ -1,0 +1,80 @@
+version: "3"
+
+services:
+  mongodb:
+    image: mvertes/alpine-mongo
+    container_name: mongodb
+    ports:
+      - 27018:27017
+    volumes:
+      - ./data:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3.12-alpine
+    container_name: rabbitmq
+    ports: 
+      - 5672:5672
+
+  customer:
+    container_name: customer
+    restart: always
+    build: 
+      dockerfile: Dockerfile
+      context: ./customer_service
+    ports:
+      - 8001:8001
+    volumes: 
+      - ./customer_service:/usr/app/customer
+    depends_on: 
+      - mongodb
+      - rabbitmq
+    env_file: 
+      - ./customer_service/.env
+
+  product:
+    container_name: product
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./product_service
+    ports:
+      - 8002:8002
+    volumes:
+      - ./product_service:/usr/app/product
+    depends_on:
+      - mongodb
+      - rabbitmq
+    env_file: 
+      - ./product_service/.env
+
+  shopping:
+    container_name: shopping
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./shopping_service
+    ports:
+      - 8003:8003
+    volumes:
+      - ./shopping_service/:/usr/app/shopping
+    depends_on:
+      - mongodb
+      - rabbitmq
+    env_file:
+      - ./shopping_service/.env
+
+  nginx:
+    container_name: nginx
+    build:
+      dockerfile: Dockerfile
+      context: ./proxy
+    ports:
+      - 80:80
+    depends_on:
+      - customer
+      - product
+      - shopping
+
+
+
+

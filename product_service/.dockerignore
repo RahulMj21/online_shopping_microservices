@@ -1,4 +1,5 @@
 node_modules
+dist
 
 app_error.log
 

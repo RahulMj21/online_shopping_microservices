@@ -4,10 +4,16 @@ WORKDIR /usr/app/product
 
 COPY package* ./
 
-RUN npm install
+COPY pnpm-lock.yaml ./
+
+RUN npm i -g pnpm
+
+RUN pnpm install
 
 COPY . .
 
+RUN pnpm build
+
 EXPOSE 8002
 
-CMD ["npm","run","start"]
+CMD ["pnpm","start"]
