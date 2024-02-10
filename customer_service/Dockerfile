@@ -2,7 +2,7 @@ FROM node:20-alpine
 
 WORKDIR /usr/app/customer
 
-COPY package* ./
+COPY package.json ./
 
 COPY pnpm-lock.yaml ./
 
@@ -10,7 +10,7 @@ RUN npm i -g pnpm
 
 RUN pnpm install
 
-COPY . .
+COPY . ./
 
 RUN pnpm build
 
